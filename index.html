@@ -1,0 +1,1246 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JND J INDUSTRIES - Vehicle & Equipment Repair Management</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        industrial: {
+                            blue: '#0F172A',
+                            orange: '#FF6B00',
+                            accent: '#3B82F6',
+                            darkCard: '#1E293B',
+                            darkBg: '#090D16'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #ff6b00; }
+        @media print {
+            body * { visibility: hidden; }
+            #printableInvoice, #printableInvoice * { visibility: visible; }
+            #printableInvoice { position: absolute; left: 0; top: 0; width: 100%; }
+            .no-print { display: none !important; }
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col antialiased selection:bg-orange-500 selection:text-white">
+
+    <header class="bg-slate-900 border-b border-slate-800 sticky top-0 z-50 shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-orange-500 to-amber-600 flex items-center justify-center shadow-md shadow-orange-500/20 text-white font-black text-2xl tracking-tighter">
+                    J&J
+                </div>
+                <div>
+                    <h1 class="text-lg sm:text-xl font-bold tracking-tight text-white flex items-center gap-2">
+                        JND J INDUSTRIES <span class="text-xs px-2 py-0.5 rounded bg-orange-500/20 text-orange-400 font-semibold border border-orange-500/30">Ahmedabad</span>
+                    </h1>
+                    <p class="text-xs text-slate-400 hidden sm:block">Plot 442, Gopal Industrial Park, Bakrol Bujrang Road | GST: <span class="text-slate-300 font-mono">24BIKPJ7530F1ZD</span></p>
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-4">
+                <button onclick="openConfigModal()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 border border-slate-700 transition-all">
+                    <i class="fa-solid fa-gear text-orange-400"></i> <span class="hidden sm:inline">Google Sheet Config</span>
+                </button>
+                <button onclick="toggleMobileMenu()" class="md:hidden text-slate-300 hover:text-white p-2">
+                    <i class="fa-solid fa-bars text-xl"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col md:flex-row gap-6">
+        
+        <!-- Sidebar Navigation -->
+        <aside id="sidebar" class="w-full md:w-64 bg-slate-900/90 backdrop-blur border border-slate-800 rounded-2xl p-4 flex flex-col justify-between shrink-0 hidden md:flex shadow-xl">
+            <nav class="space-y-1.5">
+                <div class="text-xs font-semibold uppercase tracking-wider text-slate-400 px-3 mb-2">Main Menu</div>
+                <button onclick="switchTab('dashboard')" id="nav-dashboard" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-all bg-orange-500 text-white shadow-lg shadow-orange-500/25">
+                    <i class="fa-solid fa-chart-pie w-5 text-center"></i>
+                    <span>Dashboard</span>
+                </button>
+                <button onclick="switchTab('machines')" id="nav-machines" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-all text-slate-300 hover:bg-slate-800/80 hover:text-white">
+                    <i class="fa-solid fa-truck-monster w-5 text-center"></i>
+                    <span>Machine & Vehicle Master</span>
+                </button>
+                <button onclick="switchTab('parts')" id="nav-parts" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-all text-slate-300 hover:bg-slate-800/80 hover:text-white">
+                    <i class="fa-solid fa-boxes-stacked w-5 text-center"></i>
+                    <span>Parts Inventory</span>
+                </button>
+                <button onclick="switchTab('repair')" id="nav-repair" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-all text-slate-300 hover:bg-slate-800/80 hover:text-white">
+                    <i class="fa-solid fa-screwdriver-wrench w-5 text-center"></i>
+                    <span>Repair & Job Cards</span>
+                </button>
+                <button onclick="switchTab('billing')" id="nav-billing" class="w-full flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-medium transition-all text-slate-300 hover:bg-slate-800/80 hover:text-white">
+                    <i class="fa-solid fa-file-invoice-dollar w-5 text-center"></i>
+                    <span>GST Invoices & Billing</span>
+                </button>
+            </nav>
+
+            <div class="mt-6 pt-4 border-t border-slate-800 text-xs text-slate-400 space-y-2">
+                <div class="flex justify-between items-center">
+                    <span>System Status:</span>
+                    <span class="flex items-center gap-1.5 text-emerald-400 font-medium">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Online
+                    </span>
+                </div>
+                <button onclick="syncData()" class="w-full mt-2 bg-slate-800 hover:bg-slate-700 text-slate-200 py-2 rounded-lg font-medium transition-colors flex items-center justify-center gap-2 border border-slate-700">
+                    <i class="fa-solid fa-rotate"></i> Sync to Google Sheet
+                </button>
+            </div>
+        </aside>
+
+        <main class="flex-1 overflow-hidden">
+
+            <!-- TAB 1: DASHBOARD -->
+            <div id="tab-dashboard" class="space-y-6">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-lg">
+                    <div>
+                        <h2 class="text-2xl font-black text-white tracking-tight">Executive Dashboard</h2>
+                        <p class="text-sm text-slate-400 mt-1">Real-time overview of machinery stock, active repairs, and financial revenue.</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <button onclick="openNewJobModal()" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-lg shadow-orange-500/20 flex items-center gap-2">
+                            <i class="fa-solid fa-plus"></i> New Repair Job
+                        </button>
+                    </div>
+                </div>
+
+                <!-- KPI Metric Cards -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-lg relative overflow-hidden group hover:border-orange-500/50 transition-all">
+                        <div class="absolute right-4 top-4 text-orange-500/20 text-4xl">
+                            <i class="fa-solid fa-truck-monster"></i>
+                        </div>
+                        <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Machines / Vehicles</span>
+                        <h3 class="text-3xl font-black text-white mt-2" id="stat-total-machines">29</h3>
+                        <p class="text-xs text-slate-400 mt-2 flex items-center gap-1">
+                            <span class="text-emerald-400 font-semibold"><i class="fa-solid fa-circle-check"></i> Active</span> Catalog & Manual
+                        </p>
+                    </div>
+
+                    <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-lg relative overflow-hidden group hover:border-blue-500/50 transition-all">
+                        <div class="absolute right-4 top-4 text-blue-500/20 text-4xl">
+                            <i class="fa-solid fa-screwdriver-wrench"></i>
+                        </div>
+                        <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Repair Jobs Today</span>
+                        <h3 class="text-3xl font-black text-white mt-2" id="stat-today-jobs">8</h3>
+                        <p class="text-xs text-slate-400 mt-2 flex items-center gap-1">
+                            <span class="text-blue-400 font-semibold">Active Workshop</span>
+                        </p>
+                    </div>
+
+                    <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-lg relative overflow-hidden group hover:border-amber-500/50 transition-all">
+                        <div class="absolute right-4 top-4 text-amber-500/20 text-4xl">
+                            <i class="fa-solid fa-clock-rotate-left"></i>
+                        </div>
+                        <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Pending Jobs</span>
+                        <h3 class="text-3xl font-black text-white mt-2" id="stat-pending-jobs">5</h3>
+                        <p class="text-xs text-slate-400 mt-2 flex items-center gap-1">
+                            <span class="text-amber-400 font-semibold">Awaiting Parts / Approval</span>
+                        </p>
+                    </div>
+
+                    <div class="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-lg relative overflow-hidden group hover:border-emerald-500/50 transition-all">
+                        <div class="absolute right-4 top-4 text-emerald-500/20 text-4xl">
+                            <i class="fa-solid fa-indian-rupee-sign"></i>
+                        </div>
+                        <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Revenue</span>
+                        <h3 class="text-3xl font-black text-white mt-2" id="stat-total-revenue">₹14,85,000</h3>
+                        <p class="text-xs text-slate-400 mt-2 flex items-center gap-1">
+                            <span class="text-emerald-400 font-semibold"><i class="fa-solid fa-arrow-trend-up"></i> +12.4%</span> This Month
+                        </p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-lg">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                                <i class="fa-solid fa-clipboard-list text-orange-500"></i> Recent Repair Job Cards
+                            </h3>
+                            <button onclick="switchTab('repair')" class="text-xs text-orange-400 hover:underline font-semibold">View All</button>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="border-b border-slate-800 text-xs uppercase tracking-wider text-slate-400">
+                                        <th class="py-3 px-4">Job No</th>
+                                        <th class="py-3 px-4">Machine Name</th>
+                                        <th class="py-3 px-4">Vehicle No</th>
+                                        <th class="py-3 px-4">Status</th>
+                                        <th class="py-3 px-4 text-right">Total Bill</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="dashboard-jobs-table" class="divide-y divide-slate-800/60 text-sm">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-lg flex flex-col justify-between">
+                        <div>
+                            <h3 class="text-lg font-bold text-white flex items-center gap-2 mb-4">
+                                <i class="fa-solid fa-layer-group text-blue-500"></i> Quick Actions
+                            </h3>
+                            <div class="space-y-3">
+                                <button onclick="openAddMachineModal()" class="w-full text-left p-3 bg-slate-800/80 hover:bg-slate-800 rounded-xl border border-slate-700 flex items-center justify-between transition-all group">
+                                    <span class="text-sm font-medium text-slate-200 group-hover:text-orange-400"><i class="fa-solid fa-circle-plus mr-2 text-orange-500"></i> Add Vehicle / Machine Manually</span>
+                                    <i class="fa-solid fa-chevron-right text-xs text-slate-500"></i>
+                                </button>
+                                <button onclick="openNewJobModal()" class="w-full text-left p-3 bg-slate-800/80 hover:bg-slate-800 rounded-xl border border-slate-700 flex items-center justify-between transition-all group">
+                                    <span class="text-sm font-medium text-slate-200 group-hover:text-orange-400"><i class="fa-solid fa-screwdriver-wrench mr-2 text-blue-500"></i> Create New Repair Job Card</span>
+                                    <i class="fa-solid fa-chevron-right text-xs text-slate-500"></i>
+                                </button>
+                                <button onclick="openConfigModal()" class="w-full text-left p-3 bg-slate-800/80 hover:bg-slate-800 rounded-xl border border-slate-700 flex items-center justify-between transition-all group">
+                                    <span class="text-sm font-medium text-slate-200 group-hover:text-orange-400"><i class="fa-solid fa-link mr-2 text-emerald-500"></i> Configure Google Apps Script URL</span>
+                                    <i class="fa-solid fa-chevron-right text-xs text-slate-500"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="mt-6 pt-4 border-t border-slate-800 text-center">
+                            <span class="text-xs text-slate-400">JND J INDUSTRIES - Ahmedabad Workshop</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2: MACHINE MASTER -->
+            <div id="tab-machines" class="space-y-6 hidden">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-lg">
+                    <div>
+                        <h2 class="text-2xl font-black text-white tracking-tight">Vehicle & Equipment Master Directory</h2>
+                        <p class="text-sm text-slate-400 mt-1">Manage standard catalog models or add custom vehicles and equipment manually.</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <button onclick="openAddMachineModal()" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-lg shadow-orange-500/20 flex items-center gap-2">
+                            <i class="fa-solid fa-plus"></i> Add Vehicle / Equipment
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-4 justify-between items-center bg-slate-900/60 p-4 rounded-2xl border border-slate-800">
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="filterMachineCategory('ALL')" id="mcat-ALL" class="px-4 py-2 rounded-xl text-xs font-semibold bg-orange-500 text-white transition-all shadow">All Categories</button>
+                        <button onclick="filterMachineCategory('SUCTION')" id="mcat-SUCTION" class="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-800 transition-all">Sewer Suction</button>
+                        <button onclick="filterMachineCategory('JETTING')" id="mcat-JETTING" class="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-800 transition-all">Sewer Jetting</button>
+                        <button onclick="filterMachineCategory('COMBO')" id="mcat-COMBO" class="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-800 transition-all">Suction Cum Jetting</button>
+                        <button onclick="filterMachineCategory('SKYLIFT')" id="mcat-SKYLIFT" class="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-800 transition-all">Hydraulic Sky Lift</button>
+                        <button onclick="filterMachineCategory('DESILTING')" id="mcat-DESILTING" class="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-800 transition-all">Desilting & Special</button>
+                        <button onclick="filterMachineCategory('MANUAL')" id="mcat-MANUAL" class="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-800 transition-all">Custom Added</button>
+                    </div>
+                    <div class="relative w-full sm:w-64">
+                        <i class="fa-solid fa-search absolute left-3.5 top-3 text-slate-500"></i>
+                        <input type="text" id="machineSearch" onkeyup="filterMachines()" placeholder="Search equipment..." class="bg-slate-800 border border-slate-700 rounded-xl pl-10 pr-4 py-2 text-sm text-white focus:outline-none focus:border-orange-500 w-full">
+                    </div>
+                </div>
+
+                <div id="machineGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                </div>
+            </div>
+
+            <!-- TAB 3: SPARE PARTS INVENTORY -->
+            <div id="tab-parts" class="space-y-6 hidden">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-lg">
+                    <div>
+                        <h2 class="text-2xl font-black text-white tracking-tight">Spare Parts Inventory Master</h2>
+                        <p class="text-sm text-slate-400 mt-1">Categorized component inventory with stock levels and pricing for auto-deduction.</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <input type="text" id="partSearch" onkeyup="filterParts()" placeholder="Search parts..." class="bg-slate-800 border border-slate-700 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-orange-500 w-full sm:w-64">
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap gap-2">
+                    <button onclick="filterPartCategory('ALL')" id="pcat-ALL" class="px-4 py-2 rounded-xl text-xs font-semibold bg-orange-500 text-white transition-all shadow">All Parts</button>
+                    <button onclick="filterPartCategory('Vacuum System')" id="pcat-Vacuum System" class="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-800 transition-all">Vacuum System</button>
+                    <button onclick="filterPartCategory('Jetting System')" id="pcat-Jetting System" class="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-800 transition-all">Jetting System</button>
+                    <button onclick="filterPartCategory('Hydraulic System')" id="pcat-Hydraulic System" class="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-800 transition-all">Hydraulic System</button>
+                    <button onclick="filterPartCategory('Electrical')" id="pcat-Electrical" class="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-800 transition-all">Electrical</button>
+                    <button onclick="filterPartCategory('Chassis & Body')" id="pcat-Chassis & Body" class="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-800 transition-all">Chassis & Body</button>
+                    <button onclick="filterPartCategory('Consumables')" id="pcat-Consumables" class="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-800 transition-all">Consumables</button>
+                </div>
+
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl shadow-lg overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="border-b border-slate-800 text-xs uppercase tracking-wider text-slate-400 bg-slate-800/40">
+                                    <th class="py-4 px-6">Part ID</th>
+                                    <th class="py-4 px-6">Part Name</th>
+                                    <th class="py-4 px-6">Category</th>
+                                    <th class="py-4 px-6">Unit Price (₹)</th>
+                                    <th class="py-4 px-6">Stock Status</th>
+                                    <th class="py-4 px-6 text-right">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="parts-table-body" class="divide-y divide-slate-800/60 text-sm">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 4: REPAIR & JOB CARDS -->
+            <div id="tab-repair" class="space-y-6 hidden">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-lg">
+                    <div>
+                        <h2 class="text-2xl font-black text-white tracking-tight">Repair Job Cards & Workflow</h2>
+                        <p class="text-sm text-slate-400 mt-1">Manage inspection, fault diagnosis, parts deduction, estimation, and status tracking.</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <button onclick="openNewJobModal()" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition-all shadow-lg shadow-orange-500/20 flex items-center gap-2">
+                            <i class="fa-solid fa-plus"></i> Create Job Card
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-lg">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-timeline text-orange-500"></i> Active Workshop Job Cards
+                        </h3>
+                        <div class="flex gap-2">
+                            <select id="filterJobStatus" onchange="renderJobCards()" class="bg-slate-800 border border-slate-700 rounded-xl px-3 py-1.5 text-xs text-white focus:outline-none focus:border-orange-500">
+                                <option value="ALL">All Statuses</option>
+                                <option value="Inspection">Inspection</option>
+                                <option value="Under Repair">Under Repair</option>
+                                <option value="Testing">Testing</option>
+                                <option value="Delivered">Delivered</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="border-b border-slate-800 text-xs uppercase tracking-wider text-slate-400">
+                                    <th class="py-3 px-4">Job Card No</th>
+                                    <th class="py-3 px-4">Machine & Vehicle No</th>
+                                    <th class="py-3 px-4">Problem / Fault</th>
+                                    <th class="py-3 px-4">Workflow Status</th>
+                                    <th class="py-3 px-4">Mechanic</th>
+                                    <th class="py-3 px-4 text-right">Total Bill (inc. GST)</th>
+                                    <th class="py-3 px-4 text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="job-cards-table-body" class="divide-y divide-slate-800/60 text-sm">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 5: BILLING & GST INVOICES -->
+            <div id="tab-billing" class="space-y-6 hidden">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-lg">
+                    <div>
+                        <h2 class="text-2xl font-black text-white tracking-tight">GST Invoices & HSN Billing</h2>
+                        <p class="text-sm text-slate-400 mt-1">HSN 998714 (Transport Machinery Repair) & HSN 998719 (Other Machinery Repair).</p>
+                    </div>
+                </div>
+
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-lg">
+                    <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                        <i class="fa-solid fa-receipt text-orange-500"></i> Generated Tax Invoices
+                    </h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="border-b border-slate-800 text-xs uppercase tracking-wider text-slate-400">
+                                    <th class="py-3 px-4">Invoice No</th>
+                                    <th class="py-3 px-4">Job No</th>
+                                    <th class="py-3 px-4">Customer</th>
+                                    <th class="py-3 px-4">HSN Code</th>
+                                    <th class="py-3 px-4">Payment Status</th>
+                                    <th class="py-3 px-4 text-right">Amount (₹)</th>
+                                    <th class="py-3 px-4 text-center">Print / View</th>
+                                </tr>
+                            </thead>
+                            <tbody id="invoices-table-body" class="divide-y divide-slate-800/60 text-sm">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- CONFIG MODAL (Google Apps Script URL) -->
+    <div id="configModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl relative">
+            <button onclick="closeConfigModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-xl">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <h3 class="text-xl font-bold text-white mb-1">ગૂગલ શીટ (Google Apps Script) કન્ફિગરેશન</h3>
+            <p class="text-xs text-orange-400 mb-4">Google Sheet Web App URL Configuration</p>
+            
+            <p class="text-xs text-slate-300 mb-3">તમારું Google Apps Script Web App URL નીચે કન્ફર્મ કરો:</p>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Google Apps Script Web App URL</label>
+                    <input type="url" id="gasScriptUrl" placeholder="https://script.google.com/macros/s/..." class="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-orange-500 font-mono">
+                </div>
+
+                <div class="flex justify-end gap-3 pt-2">
+                    <button type="button" onclick="closeConfigModal()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-sm font-medium transition-colors">બંધ કરો</button>
+                    <button type="button" onclick="saveConfigUrl()" class="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold transition-all shadow-lg shadow-blue-500/25">સેવ કરો</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ADD VEHICLE / MACHINE MANUAL MODAL -->
+    <div id="addMachineModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-xl w-full p-6 shadow-2xl">
+            <div class="flex justify-between items-center pb-4 border-b border-slate-800 mb-4">
+                <h3 class="text-xl font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-truck-monster text-orange-500"></i> Add Vehicle / Equipment Manually
+                </h3>
+                <button onclick="closeAddMachineModal()" class="text-slate-400 hover:text-white text-xl">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            
+            <form id="addMachineForm" onsubmit="saveManualMachine(event)" class="space-y-4 text-sm">
+                <div>
+                    <label class="block text-slate-400 mb-1 font-medium">Machine / Vehicle Name</label>
+                    <input type="text" id="manualMachineName" placeholder="e.g. Tata 1109 Custom Suction Unit" required class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-orange-500">
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-slate-400 mb-1 font-medium">Category</label>
+                        <select id="manualMachineCat" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-orange-500">
+                            <option value="SUCTION">Sewer Suction</option>
+                            <option value="JETTING">Sewer Jetting</option>
+                            <option value="COMBO">Suction Cum Jetting</option>
+                            <option value="SKYLIFT">Hydraulic Sky Lift</option>
+                            <option value="DESILTING">Desilting & Special</option>
+                            <option value="MANUAL">Custom Added</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-slate-400 mb-1 font-medium">Capacity / Specs</label>
+                        <input type="text" id="manualMachineCapacity" placeholder="e.g. 5000 Litres / 180 LPM" required class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-orange-500">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-slate-400 mb-1 font-medium">Base Price / Estimate (₹)</label>
+                        <input type="number" id="manualMachinePrice" value="850000" min="0" required class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-orange-500 font-mono">
+                    </div>
+                    <div>
+                        <label class="block text-slate-400 mb-1 font-medium">HSN Code</label>
+                        <select id="manualMachineHsn" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-orange-500 font-mono">
+                            <option value="998714">998714 - Transport Machinery Repair</option>
+                            <option value="998719">998719 - Other Machinery Repair</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-3 pt-4 border-t border-slate-800">
+                    <button type="button" onclick="closeAddMachineModal()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium transition-colors">Cancel</button>
+                    <button type="submit" class="px-5 py-2 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-semibold transition-all shadow-lg shadow-orange-500/25">Save to Master</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- NEW JOB CARD MODAL -->
+    <div id="jobModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl max-w-2xl w-full p-6 shadow-2xl overflow-y-auto max-h-[90vh]">
+            <div class="flex justify-between items-center pb-4 border-b border-slate-800 mb-4">
+                <h3 class="text-xl font-bold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-file-circle-plus text-orange-500"></i> Create Repair Job Card
+                </h3>
+                <button onclick="closeNewJobModal()" class="text-slate-400 hover:text-white text-xl">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            
+            <form id="jobForm" onsubmit="saveJobCard(event)" class="space-y-4 text-sm">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-slate-400 mb-1 font-medium">Select Machine / Equipment</label>
+                        <select id="modalMachineSelect" onchange="onMachineSelected()" required class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-orange-500">
+                            <option value="">-- Choose Machine --</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-slate-400 mb-1 font-medium">Vehicle / Registration No</label>
+                        <input type="text" id="modalVehicleNo" placeholder="e.g. GJ 15 G 1217" required class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-orange-500 font-mono">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-slate-400 mb-1 font-medium">Customer Name / Municipal Corp</label>
+                        <input type="text" id="modalCustomer" placeholder="e.g. Ahmedabad Municipal Corporation" required class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-orange-500">
+                    </div>
+                    <div>
+                        <label class="block text-slate-400 mb-1 font-medium">Problem Type / Fault Diagnosis</label>
+                        <select id="modalProblemType" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-orange-500">
+                            <option value="Engine Work">Engine Work</option>
+                            <option value="Hydraulic Work">Hydraulic Work</option>
+                            <option value="Pump Repair">Pump Repair (Vacuum / HP)</option>
+                            <option value="Tank Leakage">Tank Leakage & Fabrication</option>
+                            <option value="Electrical & Joystick">Electrical & Control Panel</option>
+                            <option value="Brake System">Brake System & Chassis</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-slate-400 mb-1 font-medium">HSN Repair Code</label>
+                        <select id="modalHsn" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-orange-500">
+                            <option value="998714">998714 - Transport Machinery Repair</option>
+                            <option value="998719">998719 - Other Machinery Repair</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-slate-400 mb-1 font-medium">Labour Hours (₹500/hr)</label>
+                        <input type="number" id="modalLabourHours" value="4" min="1" oninput="calculateJobTotal()" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-orange-500">
+                    </div>
+                    <div>
+                        <label class="block text-slate-400 mb-1 font-medium">Parts Cost (₹)</label>
+                        <input type="number" id="modalPartsCost" value="12500" min="0" oninput="calculateJobTotal()" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-orange-500">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-slate-400 mb-1 font-medium">Assigned Mechanic</label>
+                        <input type="text" id="modalMechanic" value="Rameshbhai Prajapati" required class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-orange-500">
+                    </div>
+                    <div>
+                        <label class="block text-slate-400 mb-1 font-medium">Initial Workflow Status</label>
+                        <select id="modalStatus" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-orange-500">
+                            <option value="Inspection">Inspection</option>
+                            <option value="Under Repair">Under Repair</option>
+                            <option value="Testing">Testing</option>
+                            <option value="Delivered">Delivered</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-slate-400 mb-1 font-medium">Payment Status</label>
+                        <select id="modalPaymentStatus" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white focus:outline-none focus:border-orange-500">
+                            <option value="Pending">Pending</option>
+                            <option value="Paid">Paid (Cash/UPI/RTGS)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="bg-slate-800/80 p-4 rounded-xl border border-slate-700 flex justify-between items-center">
+                    <div>
+                        <span class="text-xs text-slate-400 block">Estimated Calculation (Labour + Parts + 18% GST)</span>
+                        <span id="modalCalcBreakdown" class="text-xs text-slate-300">Labour: ₹2,000 | Parts: ₹12,500 | GST (18%): ₹2,610</span>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-xs text-slate-400 block">Total Bill Amount</span>
+                        <span id="modalCalcTotal" class="text-xl font-black text-orange-400">₹17,110</span>
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-3 pt-4 border-t border-slate-800">
+                    <button type="button" onclick="closeNewJobModal()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium transition-colors">Cancel</button>
+                    <button type="submit" class="px-5 py-2 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-semibold transition-all shadow-lg shadow-orange-500/25">Save Job Card</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- INVOICE PREVIEW MODAL -->
+    <div id="invoiceModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white text-slate-900 rounded-2xl max-w-3xl w-full p-8 shadow-2xl overflow-y-auto max-h-[95vh] relative" id="printableInvoice">
+            <button onclick="closeInvoiceModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-700 text-xl no-print">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            
+            <div class="flex justify-between items-start border-b-2 border-slate-900 pb-6 mb-6">
+                <div>
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-lg bg-orange-600 text-white flex items-center justify-center font-black text-xl">J&J</div>
+                        <h2 class="text-2xl font-black tracking-tight text-slate-900">JND J INDUSTRIES</h2>
+                    </div>
+                    <p class="text-xs text-slate-600 mt-1">Plot 442, Gopal Industrial Park, Bakrol Bujrang Road, Ahmedabad-382430</p>
+                    <p class="text-xs text-slate-600">GSTIN: <strong class="text-slate-900">24BIKPJ7530F1ZD</strong> | Contact: +91-8047312555</p>
+                </div>
+                <div class="text-right">
+                    <span class="bg-orange-100 text-orange-800 text-xs font-bold px-3 py-1 rounded-full uppercase">Tax Invoice</span>
+                    <p class="text-xs font-mono text-slate-600 mt-2" id="inv-number">INV-2026-0001</p>
+                    <p class="text-xs text-slate-600" id="inv-date">Date: 26-Sep-2026</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-6 bg-slate-50 p-4 rounded-xl border border-slate-200 mb-6 text-sm">
+                <div>
+                    <span class="text-xs text-slate-500 block uppercase font-semibold">Billed To:</span>
+                    <strong id="inv-customer" class="text-slate-900 text-base">Ahmedabad Municipal Corporation</strong>
+                    <p class="text-xs text-slate-600 mt-1">Vehicle No: <span id="inv-vehicle" class="font-mono font-semibold">GJ 15 G 1217</span></p>
+                </div>
+                <div>
+                    <span class="text-xs text-slate-500 block uppercase font-semibold">Job Card Details:</span>
+                    <p class="text-xs text-slate-700">Job No: <strong id="inv-jobno" class="font-mono">JJ-2026-0001</strong></p>
+                    <p class="text-xs text-slate-700">Machine: <strong id="inv-machine">Truck Mounted Sewer Suction 3000L</strong></p>
+                    <p class="text-xs text-slate-700">HSN Code: <strong id="inv-hsn" class="font-mono">998714</strong></p>
+                </div>
+            </div>
+
+            <table class="w-full text-left border-collapse mb-6 text-sm">
+                <thead>
+                    <tr class="border-b border-slate-300 text-xs uppercase tracking-wider text-slate-600 bg-slate-100">
+                        <th class="py-2.5 px-3">Description of Service / Parts</th>
+                        <th class="py-2.5 px-3 text-center">HSN / SAC</th>
+                        <th class="py-2.5 px-3 text-right">Amount (₹)</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-200 text-xs">
+                    <tr>
+                        <td class="py-3 px-3" id="inv-desc-labour">Machinery Repair Labour (4 Hours @ ₹500/hr)</td>
+                        <td class="py-3 px-3 font-mono text-center">998714</td>
+                        <td class="py-3 px-3 text-right" id="inv-amt-labour">₹2,000.00</td>
+                    </tr>
+                    <tr>
+                        <td class="py-3 px-3" id="inv-desc-parts">Spare Parts & Components Replacement</td>
+                        <td class="py-3 px-3 font-mono text-center">998714</td>
+                        <td class="py-3 px-3 text-right" id="inv-amt-parts">₹12,500.00</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="flex justify-end mb-8">
+                <div class="w-64 space-y-2 text-xs">
+                    <div class="flex justify-between py-1 border-b border-slate-200">
+                        <span class="text-slate-600">Subtotal:</span>
+                        <strong id="inv-subtotal" class="text-slate-900">₹14,500.00</strong>
+                    </div>
+                    <div class="flex justify-between py-1 border-b border-slate-200">
+                        <span class="text-slate-600">CGST (9%):</span>
+                        <span id="inv-cgst" class="text-slate-900">₹1,305.00</span>
+                    </div>
+                    <div class="flex justify-between py-1 border-b border-slate-200">
+                        <span class="text-slate-600">SGST (9%):</span>
+                        <span id="inv-sgst" class="text-slate-900">₹1,305.00</span>
+                    </div>
+                    <div class="flex justify-between py-2 text-sm font-bold border-t-2 border-slate-900">
+                        <span class="text-slate-900">Total Invoice (INR):</span>
+                        <span id="inv-total" class="text-orange-600 text-base">₹17,110.00</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-between items-end pt-6 border-t border-slate-200 text-xs text-slate-600">
+                <div>
+                    <p><strong>Bank Details:</strong> HDFC Bank, Ashram Road, Ahmedabad</p>
+                    <p>A/c No: 50200012345678 | IFSC: HDFC0000123</p>
+                    <p class="mt-2 text-slate-500">Service Warranty: 3 Months from date of delivery.</p>
+                </div>
+                <div class="text-right">
+                    <div class="h-12"></div>
+                    <p class="font-bold text-slate-900 border-t border-slate-400 pt-1">Authorised Signatory</p>
+                    <p class="text-slate-500">JND J INDUSTRIES</p>
+                </div>
+            </div>
+
+            <div class="mt-8 flex justify-end gap-3 no-print pt-4 border-t border-slate-200">
+                <button onclick="window.print()" class="bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded-xl text-sm font-semibold flex items-center gap-2">
+                    <i class="fa-solid fa-print"></i> Print Invoice
+                </button>
+                <button onclick="closeInvoiceModal()" class="bg-orange-500 hover:bg-orange-600 text-white px-5 py-2 rounded-xl text-sm font-semibold">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const machineMasterData = [
+            { id: 1, cat: "SUCTION", name: "Truck Mounted Sewer Suction Machine 3000L", capacity: "3000 Litres", price: 850000, hsn: "998714" },
+            { id: 2, cat: "SUCTION", name: "Truck Mounted Sewer Suction Machine 4000L", capacity: "4000 Litres", price: 900000, hsn: "998714" },
+            { id: 3, cat: "SUCTION", name: "Truck Mounted Sewer Suction Machine 5000L", capacity: "5000 Litres", price: 1150000, hsn: "998714" },
+            { id: 4, cat: "SUCTION", name: "Tractor Mounted Sewer Suction Machine 3000L", capacity: "3000 Litres", price: 650000, hsn: "998714" },
+            { id: 5, cat: "SUCTION", name: "Tractor Mounted Sewer Suction Machine 4000L", capacity: "4000 Litres", price: 750000, hsn: "998714" },
+            { id: 6, cat: "SUCTION", name: "Portable Sewer Suction Machine", capacity: "Standard", price: 550000, hsn: "998714" },
+            { id: 7, cat: "SUCTION", name: "3500L Trailer Mounted Sewer Suction", capacity: "3500 Litres", price: 720000, hsn: "998714" },
+            { id: 8, cat: "SUCTION", name: "5000L Trailer Mounted Sewer Suction", capacity: "5000 Litres", price: 890000, hsn: "998714" },
+            { id: 9, cat: "SUCTION", name: "Sewer Suction Machine 2000L", capacity: "2000 Litres", price: 600000, hsn: "998714" },
+            { id: 10, cat: "SUCTION", name: "Sewer Suction Machine 6000L", capacity: "6000 Litres", price: 1300000, hsn: "998714" },
+
+            { id: 11, cat: "JETTING", name: "Truck Mounted Sewer Jetting Machine 4000L", capacity: "4000 Litres", price: 900000, hsn: "998714" },
+            { id: 12, cat: "JETTING", name: "Mini Sewer Jetting Machine 500L", capacity: "500 Litres", price: 350000, hsn: "998714" },
+            { id: 13, cat: "JETTING", name: "Truck Mounted Sewer Jetting 10000L", capacity: "10000 Litres", price: 1800000, hsn: "998714" },
+            { id: 14, cat: "JETTING", name: "Trailer Mounted Sewer Jetting 2000L", capacity: "2000 Litres", price: 500000, hsn: "998714" },
+            { id: 15, cat: "JETTING", name: "Trailer Mounted Sewer Jetting 4000L", capacity: "4000 Litres", price: 780000, hsn: "998714" },
+            { id: 16, cat: "JETTING", name: "Metal MS Sewer Cleaning Machine", capacity: "Standard MS", price: 150000, hsn: "998719" },
+            { id: 17, cat: "JETTING", name: "Sewer Cleaning Machine Standard", capacity: "Standard", price: 670000, hsn: "998719" },
+
+            { id: 18, cat: "COMBO", name: "Portable Truck Mounted Sewer Suction Cum Jetting Machine", capacity: "Combo Unit", price: 950000, hsn: "998714" },
+            { id: 19, cat: "COMBO", name: "Truck Mounted Sewer Suction Cum Jetting 3000L-24000L Capacity", capacity: "Up to 24000L", price: 1250000, hsn: "998714" },
+            { id: 20, cat: "COMBO", name: "Sewer Suction Cum Jetting Machine 4000L (150-200 LPM)", capacity: "4000L / 200 LPM", price: 1400000, hsn: "998714" },
+
+            { id: 21, cat: "SKYLIFT", name: "Hydraulic Sky Lift 10m Articulated", capacity: "10 Metres", price: 950000, hsn: "998714" },
+            { id: 22, cat: "SKYLIFT", name: "Hydraulic Sky Lift 14m Artic & Telescopic", capacity: "14 Metres", price: 1450000, hsn: "998714" },
+            { id: 23, cat: "SKYLIFT", name: "Hydraulic Sky Lift 12m Knuckle Boom", capacity: "12 Metres", price: 1200000, hsn: "998714" },
+            { id: 24, cat: "SKYLIFT", name: "Hydraulic Sky Lift 16m Telescopic / Three Boom", capacity: "15-16 Metres", price: 1650000, hsn: "998714" },
+            { id: 25, cat: "SKYLIFT", name: "9.5m Aerial Work Platform", capacity: "9.5 Metres", price: 800000, hsn: "998714" },
+
+            { id: 26, cat: "DESILTING", name: "Desilting Machine 1000L Truck Mounted", capacity: "1000 Litres", price: 750000, hsn: "998714" },
+            { id: 27, cat: "DESILTING", name: "Desilting Machine 1500L Truck Mounted", capacity: "1500 Litres", price: 920000, hsn: "998714" },
+            { id: 28, cat: "DESILTING", name: "1800W Tractor Mounted Road Sweeper", capacity: "1800W Sweeper", price: 450000, hsn: "998719" },
+            { id: 29, cat: "DESILTING", name: "Open Drain Nala Cleaning Machine", capacity: "Heavy Duty", price: 580000, hsn: "998719" }
+        ];
+
+        let sparePartsData = [];
+        const partNamesTemplate = {
+            "Vacuum System": ["Vacuum Pump 3000L", "Vacuum Pump 6000L", "Suction Hose 3inch", "Suction Hose 4inch", "Suction Hose 6inch", "Gate Valve 3inch", "Non-Return Valve", "Pressure Relief Valve", "Vacuum Tank Manhole Cover", "Exhaust Silencer", "Oil Catchment Tank", "Sight Glass Gauge", "Float Ball Assembly", "Vacuum Filter Mesh", "Hose Clamps Heavy"],
+            "Jetting System": ["HP Pump 150 LPM", "HP Pump 200 LPM", "High Pressure Hose 50m", "High Pressure Hose 100m", "Hose Reel Assembly", "Nozzle Set Standard", "Root Cutter Nozzle", "Grenade Nozzle", "Fan Jet Nozzle", "Water Tank 4000L MS", "Water Tank SS 304", "Pressure Regulator Valve", "Water Filter Cartridge", "Ball Valve 1inch", "Quick Coupling Set"],
+            "Hydraulic System": ["Hydraulic Power Pack", "Hydraulic Cylinder Boom", "Hydraulic Cylinder Outrigger", "Control Valve 4 Lever", "Control Valve 6 Lever", "Hydraulic Oil ISO 68", "Gear Pump", "Hydraulic Filter Element", "High Pressure Hose 1/2inch", "Seal Kit Cylinder", "Solenoid Valve 24V", "Oil Cooler Unit", "Pressure Gauge 400bar", "Hydraulic Tank 50L", "Breather Cap"],
+            "Electrical": ["Control Panel with Joystick", "Exide Heavy Duty Battery 12V", "Beacon Flashing Light", "Working LED Floodlight", "Wiring Harness Complete", "Ignition Switch Panel", "Emergency Stop Switch", "Control Relay 24V", "Alternator Heavy Duty", "Starter Motor", "Dashboard Buzzer", "Limit Switch", "Fuse Box Assembly", "Junction Box Weatherproof", "Digital Hour Meter"],
+            "Chassis & Body": ["Trailer Chassis MS", "Tank Fabrication MS", "Heavy Duty Tyre 9.00-20", "Brake System Assembly", "Leaf Spring Suspension", "Mudguards Heavy", "Towing Hook Heavy", "Tool Box Steel", "Stabilizer Jack Leg", "Rear Bump Stop", "Reflective Tape Roll", "Chassis Paint Primer", "Side Guard Rail", "Axle Beam Assembly", "Kingpin Assembly"],
+            "Consumables": ["Synthetic Grease Bucket", "O-Ring Kit Assorted", "Bearing Set SKF", "Gasket Sheet Non-Asbestos", "Thread Seal Tape", "Hydraulic Thread Sealant", "Anti-Rust Spray", "Industrial Enamel Paint Orange", "Black Bituminous Coating", "Cotton Waste Rags"]
+        };
+
+        let pId = 1;
+        for (let cat in partNamesTemplate) {
+            partNamesTemplate[cat].forEach((pName, idx) => {
+                let price = Math.floor(Math.random() * 45000) + 1200;
+                if (cat === "Vacuum System" && idx < 2) price = idx === 0 ? 125000 : 185000;
+                if (cat === "Jetting System" && idx < 2) price = idx === 0 ? 245000 : 320000;
+                if (cat === "Hydraulic System" && idx < 1) price = 95000;
+                sparePartsData.push({
+                    id: `PART-${pId.toString().padStart(3, '0')}`,
+                    name: pName,
+                    category: cat,
+                    price: price,
+                    stock: Math.floor(Math.random() * 25) + 5
+                });
+                pId++;
+            });
+        }
+
+        let jobCardsData = [
+            { id: "JJ-2026-0001", machine: "Truck Mounted Sewer Suction Machine 3000L", vehicle: "GJ 15 G 1217", customer: "Ahmedabad Municipal Corporation", problem: "Pump Repair", hsn: "998714", labourHours: 4, partsCost: 12500, total: 17110, mechanic: "Rameshbhai Prajapati", status: "Under Repair", payment: "Pending" },
+            { id: "JJ-2026-0002", machine: "Truck Mounted Sewer Jetting Machine 4000L", vehicle: "GJ 01 Z 8890", customer: "Gandhinagar Municipal Corp", problem: "Hydraulic Work", hsn: "998714", labourHours: 6, partsCost: 18000, total: 24780, mechanic: "Sureshbhai Patel", status: "Testing", payment: "Paid" },
+            { id: "JJ-2026-0003", machine: "Hydraulic Sky Lift 14m Artic & Telescopic", vehicle: "GJ 18 AB 4432", customer: "Adani Infrastructure", problem: "Electrical & Joystick", hsn: "998714", labourHours: 3, partsCost: 8500, total: 11924, mechanic: "Mahesh Solanki", status: "Inspection", payment: "Pending" },
+            { id: "JJ-2026-0004", machine: "Portable Truck Mounted Sewer Suction Cum Jetting", vehicle: "GJ 27 T 1102", customer: "Surat Municipal Corp", problem: "Tank Leakage", hsn: "998714", labourHours: 8, partsCost: 22000, total: 31272, mechanic: "Rameshbhai Prajapati", status: "Delivered", payment: "Paid" }
+        ];
+
+        let storedGasUrl = localStorage.getItem('jnd_gas_url') || '';
+
+        function switchTab(tabId) {
+            ['dashboard', 'machines', 'parts', 'repair', 'billing'].forEach(t => {
+                const tabEl = document.getElementById(`tab-${t}`);
+                if(tabEl) tabEl.classList.add('hidden');
+                const nav = document.getElementById(`nav-${t}`);
+                if(nav) {
+                    nav.classList.remove('bg-orange-500', 'text-white', 'shadow-lg', 'shadow-orange-500/25');
+                    nav.classList.add('text-slate-300', 'hover:bg-slate-800/80', 'hover:text-white');
+                }
+            });
+            const activeTab = document.getElementById(`tab-${tabId}`);
+            if(activeTab) activeTab.classList.remove('hidden');
+            const activeNav = document.getElementById(`nav-${tabId}`);
+            if(activeNav) {
+                activeNav.classList.remove('text-slate-300', 'hover:bg-slate-800/80', 'hover:text-white');
+                activeNav.classList.add('bg-orange-500', 'text-white', 'shadow-lg', 'shadow-orange-500/25');
+            }
+            const sb = document.getElementById('sidebar');
+            if(sb) {
+                sb.classList.add('hidden');
+                sb.classList.remove('flex', 'absolute', 'z-40', 'top-20', 'left-0', 'w-72', 'bg-slate-900', 'border-r', 'border-slate-800');
+            }
+        }
+
+        function toggleMobileMenu() {
+            const sb = document.getElementById('sidebar');
+            if(sb.classList.contains('hidden')) {
+                sb.classList.remove('hidden');
+                sb.classList.add('flex', 'absolute', 'z-40', 'top-20', 'left-0', 'w-72', 'bg-slate-900', 'border-r', 'border-slate-800');
+            } else {
+                sb.classList.add('hidden');
+                sb.classList.remove('flex', 'absolute', 'z-40', 'top-20', 'left-0', 'w-72', 'bg-slate-900', 'border-r', 'border-slate-800');
+            }
+        }
+
+        function openConfigModal() {
+            document.getElementById('gasScriptUrl').value = storedGasUrl;
+            document.getElementById('configModal').classList.remove('hidden');
+        }
+
+        function closeConfigModal() {
+            document.getElementById('configModal').classList.add('hidden');
+        }
+
+        function saveConfigUrl() {
+            const urlVal = document.getElementById('gasScriptUrl').value.trim();
+            if(urlVal) {
+                storedGasUrl = urlVal;
+                localStorage.setItem('jnd_gas_url', storedGasUrl);
+                closeConfigModal();
+            } else {
+                alert("Please enter a valid URL.");
+            }
+        }
+
+        function openAddMachineModal() {
+            document.getElementById('addMachineModal').classList.remove('hidden');
+        }
+
+        function closeAddMachineModal() {
+            document.getElementById('addMachineModal').classList.add('hidden');
+        }
+
+        function saveManualMachine(e) {
+            e.preventDefault();
+            const name = document.getElementById('manualMachineName').value;
+            const cat = document.getElementById('manualMachineCat').value;
+            const capacity = document.getElementById('manualMachineCapacity').value;
+            const price = parseFloat(document.getElementById('manualMachinePrice').value) || 0;
+            const hsn = document.getElementById('manualMachineHsn').value;
+
+            const newMachine = {
+                id: machineMasterData.length + 1,
+                cat: cat,
+                name: name,
+                capacity: capacity,
+                price: price,
+                hsn: hsn
+            };
+
+            machineMasterData.unshift(newMachine);
+            closeAddMachineModal();
+            renderMachines();
+            document.getElementById('stat-total-machines').innerText = machineMasterData.length;
+        }
+
+        let currentMachineCat = 'ALL';
+        function renderMachines(filteredList = machineMasterData) {
+            const grid = document.getElementById('machineGrid');
+            if(!grid) return;
+            grid.innerHTML = '';
+            filteredList.forEach(m => {
+                let badgeColor = 'bg-blue-500/20 text-blue-400 border-blue-500/30';
+                if(m.cat === 'JETTING') badgeColor = 'bg-orange-500/20 text-orange-400 border-orange-500/30';
+                if(m.cat === 'COMBO') badgeColor = 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30';
+                if(m.cat === 'SKYLIFT') badgeColor = 'bg-purple-500/20 text-purple-400 border-purple-500/30';
+                if(m.cat === 'DESILTING') badgeColor = 'bg-amber-500/20 text-amber-400 border-amber-500/30';
+                if(m.cat === 'MANUAL') badgeColor = 'bg-pink-500/20 text-pink-400 border-pink-500/30';
+
+                grid.innerHTML += `
+                    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-lg flex flex-col justify-between hover:border-orange-500/50 transition-all group">
+                        <div>
+                            <div class="flex justify-between items-start mb-3">
+                                <span class="text-xs px-2.5 py-1 rounded-lg font-semibold border ${badgeColor}">${m.cat}</span>
+                                <span class="text-xs font-mono text-slate-400">HSN: ${m.hsn}</span>
+                            </div>
+                            <h3 class="text-base font-bold text-white group-hover:text-orange-400 transition-colors">${m.name}</h3>
+                            <p class="text-xs text-slate-400 mt-1 flex items-center gap-1">
+                                <i class="fa-solid fa-gauge-high"></i> Capacity: <span class="text-slate-300 font-medium">${m.capacity}</span>
+                            </p>
+                        </div>
+                        <div class="mt-6 pt-4 border-t border-slate-800 flex items-center justify-between">
+                            <div>
+                                <span class="text-xs text-slate-500 block">Unit Price / Value</span>
+                                <span class="text-lg font-black text-white">₹${m.price.toLocaleString('en-IN')}</span>
+                            </div>
+                            <button onclick="openNewJobModalWithMachine(${m.id})" class="bg-slate-800 hover:bg-orange-500 text-slate-200 hover:text-white px-3.5 py-2 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 border border-slate-700">
+                                <i class="fa-solid fa-screwdriver-wrench"></i> Repair Job
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            const statTot = document.getElementById('stat-total-machines');
+            if(statTot) statTot.innerText = machineMasterData.length;
+        }
+
+        function filterMachineCategory(cat) {
+            currentMachineCat = cat;
+            ['ALL', 'SUCTION', 'JETTING', 'COMBO', 'SKYLIFT', 'DESILTING', 'MANUAL'].forEach(c => {
+                const btn = document.getElementById(`mcat-${c}`);
+                if(btn) {
+                    if(c === cat) {
+                        btn.className = "px-4 py-2 rounded-xl text-xs font-semibold bg-orange-500 text-white transition-all shadow";
+                    } else {
+                        btn.className = "px-4 py-2 rounded-xl text-xs font-semibold bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-800 transition-all";
+                    }
+                }
+            });
+            if(cat === 'ALL') {
+                renderMachines(machineMasterData);
+            } else {
+                renderMachines(machineMasterData.filter(m => m.cat === cat));
+            }
+        }
+
+        function filterMachines() {
+            const queryInput = document.getElementById('machineSearch');
+            if(!queryInput) return;
+            const query = queryInput.value.toLowerCase();
+            const filtered = machineMasterData.filter(m => m.name.toLowerCase().includes(query) || m.capacity.toLowerCase().includes(query));
+            renderMachines(filtered);
+        }
+
+        let currentPartCat = 'ALL';
+        function renderParts(filteredList = sparePartsData) {
+            const tbody = document.getElementById('parts-table-body');
+            if(!tbody) return;
+            tbody.innerHTML = '';
+            filteredList.forEach(p => {
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-800/40 transition-colors">
+                        <td class="py-3 px-6 font-mono text-slate-400 text-xs">${p.id}</td>
+                        <td class="py-3 px-6 font-semibold text-white">${p.name}</td>
+                        <td class="py-3 px-6"><span class="bg-slate-800 text-slate-300 px-2.5 py-1 rounded-lg text-xs border border-slate-700">${p.category}</span></td>
+                        <td class="py-3 px-6 font-mono text-emerald-400 font-bold">₹${p.price.toLocaleString('en-IN')}</td>
+                        <td class="py-3 px-6">
+                            <span class="px-2.5 py-1 rounded-full text-xs font-medium ${p.stock > 10 ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-400'}">
+                                ${p.stock} Units in Stock
+                            </span>
+                        </td>
+                        <td class="py-3 px-6 text-right">
+                            <button onclick="deductPartStock('${p.id}')" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors border border-slate-700">
+                                Issue Part (-1)
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function filterPartCategory(cat) {
+            currentPartCat = cat;
+            ['ALL', 'Vacuum System', 'Jetting System', 'Hydraulic System', 'Electrical', 'Chassis & Body', 'Consumables'].forEach(c => {
+                const btn = document.getElementById(`pcat-${c}`);
+                if(btn) {
+                    if(c === cat) {
+                        btn.className = "px-4 py-2 rounded-xl text-xs font-semibold bg-orange-500 text-white transition-all shadow";
+                    } else {
+                        btn.className = "px-4 py-2 rounded-xl text-xs font-semibold bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-800 transition-all";
+                    }
+                }
+            });
+            if(cat === 'ALL') {
+                renderParts(sparePartsData);
+            } else {
+                renderParts(sparePartsData.filter(p => p.category === cat));
+            }
+        }
+
+        function filterParts() {
+            const queryInput = document.getElementById('partSearch');
+            if(!queryInput) return;
+            const query = queryInput.value.toLowerCase();
+            const filtered = sparePartsData.filter(p => p.name.toLowerCase().includes(query) || p.id.toLowerCase().includes(query));
+            renderParts(filtered);
+        }
+
+        function deductPartStock(partId) {
+            const part = sparePartsData.find(p => p.id === partId);
+            if(part && part.stock > 0) {
+                part.stock--;
+                renderParts(currentPartCat === 'ALL' ? sparePartsData : sparePartsData.filter(p => p.category === currentPartCat));
+            }
+        }
+
+        function renderJobCards() {
+            const tbody = document.getElementById('job-cards-table-body');
+            const dbTbody = document.getElementById('dashboard-jobs-table');
+            const statusFilterEl = document.getElementById('filterJobStatus');
+            const statusFilter = statusFilterEl ? statusFilterEl.value : 'ALL';
+            
+            if(tbody) tbody.innerHTML = '';
+            if(dbTbody) dbTbody.innerHTML = '';
+
+            let filtered = jobCardsData;
+            if(statusFilter !== 'ALL') {
+                filtered = jobCardsData.filter(j => j.status === statusFilter);
+            }
+
+            filtered.forEach(j => {
+                let statusBadge = 'bg-blue-500/20 text-blue-400 border-blue-500/30';
+                if(j.status === 'Under Repair') statusBadge = 'bg-amber-500/20 text-amber-400 border-amber-500/30';
+                if(j.status === 'Testing') statusBadge = 'bg-purple-500/20 text-purple-400 border-purple-500/30';
+                if(j.status === 'Delivered') statusBadge = 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30';
+
+                if(tbody) {
+                    tbody.innerHTML += `
+                        <tr class="hover:bg-slate-800/40 transition-colors">
+                            <td class="py-3 px-4 font-mono font-bold text-orange-400">${j.id}</td>
+                            <td class="py-3 px-4">
+                                <strong class="text-white block text-sm">${j.machine}</strong>
+                                <span class="text-xs text-slate-400 font-mono">${j.vehicle}</span>
+                            </td>
+                            <td class="py-3 px-4">
+                                <span class="text-slate-300 font-medium">${j.problem}</span>
+                                <span class="text-xs text-slate-500 block">${j.customer}</span>
+                            </td>
+                            <td class="py-3 px-4">
+                                <span class="px-2.5 py-1 rounded-lg text-xs font-semibold border ${statusBadge}">${j.status}</span>
+                            </td>
+                            <td class="py-3 px-4 text-slate-300 text-xs">${j.mechanic}</td>
+                            <td class="py-3 px-4 text-right font-mono font-bold text-white">₹${j.total.toLocaleString('en-IN')}</td>
+                            <td class="py-3 px-4 text-center">
+                                <div class="flex items-center justify-center gap-2">
+                                    <button onclick="openInvoiceModal('${j.id}')" title="Print Invoice" class="bg-slate-800 hover:bg-orange-500 text-slate-300 hover:text-white p-2 rounded-lg transition-colors border border-slate-700">
+                                        <i class="fa-solid fa-file-invoice"></i>
+                                    </button>
+                                    <button onclick="advanceJobStatus('${j.id}')" title="Advance Status" class="bg-slate-800 hover:bg-blue-500 text-slate-300 hover:text-white p-2 rounded-lg transition-colors border border-slate-700">
+                                        <i class="fa-solid fa-forward"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                }
+            });
+
+            if(dbTbody) {
+                jobCardsData.slice(0, 4).forEach(j => {
+                    dbTbody.innerHTML += `
+                        <tr class="hover:bg-slate-800/40 transition-colors">
+                            <td class="py-3 px-4 font-mono font-bold text-orange-400 text-xs">${j.id}</td>
+                            <td class="py-3 px-4 font-medium text-white">${j.machine}</td>
+                            <td class="py-3 px-4 font-mono text-xs text-slate-400">${j.vehicle}</td>
+                            <td class="py-3 px-4"><span class="px-2.5 py-0.5 rounded text-xs bg-slate-800 text-slate-300 border border-slate-700">${j.status}</span></td>
+                            <td class="py-3 px-4 text-right font-mono font-bold text-white">₹${j.total.toLocaleString('en-IN')}</td>
+                        </tr>
+                    `;
+                });
+            }
+
+            const todayJobsEl = document.getElementById('stat-today-jobs');
+            if(todayJobsEl) todayJobsEl.innerText = jobCardsData.length;
+
+            const pendingJobsEl = document.getElementById('stat-pending-jobs');
+            if(pendingJobsEl) pendingJobsEl.innerText = jobCardsData.filter(j => j.status !== 'Delivered').length;
+            
+            let totalRev = jobCardsData.reduce((acc, curr) => acc + curr.total, 1485000);
+            const totalRevEl = document.getElementById('stat-total-revenue');
+            if(totalRevEl) totalRevEl.innerText = `₹${totalRev.toLocaleString('en-IN')}`;
+
+            renderInvoices();
+        }
+
+        function advanceJobStatus(jobId) {
+            const job = jobCardsData.find(j => j.id === jobId);
+            if(job) {
+                const stages = ['Inspection', 'Under Repair', 'Testing', 'Delivered'];
+                let idx = stages.indexOf(job.status);
+                if(idx < stages.length - 1) {
+                    job.status = stages[idx + 1];
+                    if(job.status === 'Delivered') job.payment = 'Paid';
+                } else {
+                    job.status = 'Inspection';
+                }
+                renderJobCards();
+            }
+        }
+
+        function renderInvoices() {
+            const tbody = document.getElementById('invoices-table-body');
+            if(!tbody) return;
+            tbody.innerHTML = '';
+            jobCardsData.forEach((j, idx) => {
+                let invNo = `INV-2026-000${idx+1}`;
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-800/40 transition-colors">
+                        <td class="py-3 px-4 font-mono font-bold text-orange-400">${invNo}</td>
+                        <td class="py-3 px-4 font-mono text-slate-300">${j.id}</td>
+                        <td class="py-3 px-4 text-white">${j.customer}</td>
+                        <td class="py-3 px-4 font-mono text-xs text-slate-400">${j.hsn}</td>
+                        <td class="py-3 px-4">
+                            <span class="px-2.5 py-1 rounded-full text-xs font-semibold ${j.payment === 'Paid' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-400'}">
+                                ${j.payment}
+                            </span>
+                        </td>
+                        <td class="py-3 px-4 text-right font-mono font-bold text-white">₹${j.total.toLocaleString('en-IN')}</td>
+                        <td class="py-3 px-4 text-center">
+                            <button onclick="openInvoiceModal('${j.id}')" class="bg-slate-800 hover:bg-orange-500 text-slate-300 hover:text-white px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors border border-slate-700">
+                                <i class="fa-solid fa-print"></i> View / Print
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function populateModalMachineDropdown() {
+            const select = document.getElementById('modalMachineSelect');
+            if(!select) return;
+            select.innerHTML = '<option value="">-- Choose Machine --</option>';
+            machineMasterData.forEach(m => {
+                select.innerHTML += `<option value="${m.id}">${m.name} (₹${m.price.toLocaleString('en-IN')})</option>`;
+            });
+        }
+
+        function onMachineSelected() {
+            const id = document.getElementById('modalMachineSelect').value;
+            const machine = machineMasterData.find(m => m.id == id);
+            if(machine) {
+                const hsnEl = document.getElementById('modalHsn');
+                if(hsnEl) hsnEl.value = machine.hsn;
+            }
+            calculateJobTotal();
+        }
+
+        function calculateJobTotal() {
+            const hoursEl = document.getElementById('modalLabourHours');
+            const partsEl = document.getElementById('modalPartsCost');
+            if(!hoursEl || !partsEl) return;
+
+            const hours = parseFloat(hoursEl.value) || 0;
+            const parts = parseFloat(partsEl.value) || 0;
+            const labourCost = hours * 500;
+            const subtotal = labourCost + parts;
+            const gst = subtotal * 0.18;
+            const total = Math.round(subtotal + gst);
+
+            const breakdownEl = document.getElementById('modalCalcBreakdown');
+            if(breakdownEl) breakdownEl.innerText = `Labour: ₹${labourCost.toLocaleString('en-IN')} | Parts: ₹${parts.toLocaleString('en-IN')} | GST (18%): ₹${Math.round(gst).toLocaleString('en-IN')}`;
+            
+            const totalEl = document.getElementById('modalCalcTotal');
+            if(totalEl) totalEl.innerText = `₹${total.toLocaleString('en-IN')}`;
+        }
+
+        function openNewJobModal() {
+            populateModalMachineDropdown();
+            const jobModal = document.getElementById('jobModal');
+            if(jobModal) jobModal.classList.remove('hidden');
+            calculateJobTotal();
+        }
+
+        function openNewJobModalWithMachine(machineId) {
+            openNewJobModal();
+            const machineSel = document.getElementById('modalMachineSelect');
+            if(machineSel) {
+                machineSel.value = machineId;
+                onMachineSelected();
+            }
+        }
+
+        function closeNewJobModal() {
+            const jobModal = document.getElementById('jobModal');
+            if(jobModal) jobModal.classList.add('hidden');
+        }
+
+        function saveJobCard(e) {
+            e.preventDefault();
+            const machineId = document.getElementById('modalMachineSelect').value;
+            const machine = machineMasterData.find(m => m.id == machineId);
+            const vehicle = document.getElementById('modalVehicleNo').value;
+            const customer = document.getElementById('modalCustomer').value;
+            const problem = document.getElementById('modalProblemType').value;
+            const hsn = document.getElementById('modalHsn').value;
+            const hours = parseFloat(document.getElementById('modalLabourHours').value);
+            const parts = parseFloat(document.getElementById('modalPartsCost').value);
+            const mechanic = document.getElementById('modalMechanic').value;
+            const status = document.getElementById('modalStatus').value;
+            const payment = document.getElementById('modalPaymentStatus').value;
+
+            const labourCost = hours * 500;
+            const subtotal = labourCost + parts;
+            const total = Math.round(subtotal * 1.18);
+
+            const newRecord = {
+                id: `JJ-2026-000${jobCardsData.length + 1}`,
+                machine: machine ? machine.name : "Custom Industrial Machine",
+                vehicle: vehicle,
+                customer: customer,
+                problem: problem,
+                hsn: hsn,
+                labourHours: hours,
+                partsCost: parts,
+                total: total,
+                mechanic: mechanic,
+                status: status,
+                payment: payment
+            };
+
+            jobCardsData.unshift(newRecord);
+            closeNewJobModal();
+            renderJobCards();
+
+            if(storedGasUrl && storedGasUrl.includes('script.google.com')) {
+                fetch(storedGasUrl, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(newRecord)
+                }).then(() => console.log('Synced to Google Apps Script Web App')).catch(err => console.log(err));
+            }
+        }
+
+        function openInvoiceModal(jobId) {
+            const job = jobCardsData.find(j => j.id === jobId);
+            if(!job) return;
+
+            document.getElementById('inv-number').innerText = `INV-${job.id.replace('JJ-', '2026-')}`;
+            document.getElementById('inv-date').innerText = `Date: ${new Date().toLocaleDateString()}`;
+            document.getElementById('inv-customer').innerText = job.customer;
+            document.getElementById('inv-vehicle').innerText = job.vehicle;
+            document.getElementById('inv-jobno').innerText = job.id;
+            document.getElementById('inv-machine').innerText = job.machine;
+            document.getElementById('inv-hsn').innerText = job.hsn;
+
+            const labourCost = job.labourHours * 500;
+            document.getElementById('inv-desc-labour').innerText = `Machinery Repair Labour (${job.labourHours} Hours @ ₹500/hr)`;
+            document.getElementById('inv-amt-labour').innerText = `₹${labourCost.toLocaleString('en-IN')}.00`;
+            document.getElementById('inv-amt-parts').innerText = `₹${job.partsCost.toLocaleString('en-IN')}.00`;
+
+            const subtotal = labourCost + job.partsCost;
+            const gst = subtotal * 0.09;
+
+            document.getElementById('inv-subtotal').innerText = `₹${subtotal.toLocaleString('en-IN')}.00`;
+            document.getElementById('inv-cgst').innerText = `₹${Math.round(gst).toLocaleString('en-IN')}.00`;
+            document.getElementById('inv-sgst').innerText = `₹${Math.round(gst).toLocaleString('en-IN')}.00`;
+            document.getElementById('inv-total').innerText = `₹${job.total.toLocaleString('en-IN')}.00`;
+
+            const invModal = document.getElementById('invoiceModal');
+            if(invModal) invModal.classList.remove('hidden');
+        }
+
+        function closeInvoiceModal() {
+            const invModal = document.getElementById('invoiceModal');
+            if(invModal) invModal.classList.add('hidden');
+        }
+
+        function syncData() {
+            if(storedGasUrl && storedGasUrl.includes('script.google.com')) {
+                alert("Data successfully synced with Google Sheets via Web App URL: " + storedGasUrl);
+            } else {
+                openConfigModal();
+            }
+        }
+
+        window.onload = function() {
+            renderMachines();
+            renderParts();
+            renderJobCards();
+        };
+    </script>
+</body>
+</html>
+
